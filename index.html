@@ -3,235 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GymBuddy - Your Personal Fitness Companion</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>GymBuddy AI - Your Personal AI Fitness Trainer</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#3b82f6">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        .slide-out {
+            animation: slideOut 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+        .option-card {
+            transition: transform 0.2s;
+        }
+        .option-card:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-blue-600 text-white shadow-lg fixed w-full z-50">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-8">
-                    <a href="#" class="text-2xl font-bold">GymBuddy</a>
-                    <div class="hidden md:flex space-x-4">
-                        <a href="#workout" class="hover:text-blue-200 transition">Workout</a>
-                        <a href="#exercises" class="hover:text-blue-200 transition">Exercises</a>
-                        <a href="#programs" class="hover:text-blue-200 transition">Programs</a>
-                        <a href="#progress" class="hover:text-blue-200 transition">Progress</a>
-                    </div>
-                </div>
-                <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-white hover:text-blue-200">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
-                </div>
-            </div>
+<body class="bg-gray-50">
+    <!-- Onboarding Container -->
+    <div id="onboarding-container" class="min-h-screen">
+        <!-- Content will be dynamically inserted by onboarding.js -->
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div class="text-gray-600">Loading your experience...</div>
         </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-blue-700">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="#workout" class="block px-3 py-2 hover:bg-blue-800 rounded">Workout</a>
-                <a href="#exercises" class="block px-3 py-2 hover:bg-blue-800 rounded">Exercises</a>
-                <a href="#programs" class="block px-3 py-2 hover:bg-blue-800 rounded">Programs</a>
-                <a href="#progress" class="block px-3 py-2 hover:bg-blue-800 rounded">Progress</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 pt-20 pb-12">
-        <!-- Current Workout Section -->
-        <section id="workout" class="mb-12">
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-2xl font-bold mb-6">Current Workout</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Timer -->
-                    <div id="timer" class="bg-gray-50 rounded-lg p-6 text-center">
-                        <div id="timer-display" class="text-6xl font-bold mb-4">00:00</div>
-                        <div class="flex justify-center space-x-4">
-                            <button id="start-timer" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-play mr-2"></i>Start
-                            </button>
-                            <button id="pause-timer" class="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 transition opacity-50 cursor-not-allowed" disabled>
-                                <i class="fas fa-pause mr-2"></i>Pause
-                            </button>
-                            <button id="reset-timer" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition">
-                                <i class="fas fa-stop mr-2"></i>Reset
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Quick Log -->
-                    <div class="bg-gray-50 rounded-lg p-6">
-                        <h3 class="text-xl font-semibold mb-4">Quick Log</h3>
-                        <form id="log-workout-form" class="space-y-4">
-                            <div>
-                                <label class="block text-gray-700 mb-2" for="workout-type">Type</label>
-                                <select id="workout-type" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                                    <option value="Strength Training">Strength Training</option>
-                                    <option value="Cardio">Cardio</option>
-                                    <option value="HIIT">HIIT</option>
-                                    <option value="Yoga">Yoga</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2" for="workout-duration">Duration (minutes)</label>
-                                <input type="number" id="workout-duration" min="1" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2" for="workout-notes">Notes</label>
-                                <textarea id="workout-notes" rows="2" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
-                            </div>
-                            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-plus mr-2"></i>Log Workout
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Exercise Library Section -->
-        <section id="exercises" class="mb-12">
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-2xl font-bold mb-6">Exercise Library</h2>
-                <!-- Filters -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div>
-                        <input type="text" id="exercise-search" placeholder="Search exercises..." 
-                               class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <select id="category-filter" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                            <option value="">All Categories</option>
-                            <option value="Legs">Legs</option>
-                            <option value="Back">Back</option>
-                            <option value="Chest">Chest</option>
-                            <option value="Shoulders">Shoulders</option>
-                            <option value="Arms">Arms</option>
-                            <option value="Core">Core</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select id="difficulty-filter" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                            <option value="">All Difficulties</option>
-                            <option value="Beginner">Beginner</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select id="muscle-filter" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                            <!-- Populated by JavaScript -->
-                        </select>
-                    </div>
-                </div>
-                <!-- Featured Toggle -->
-                <div class="flex items-center mb-6">
-                    <input type="checkbox" id="featured-filter" class="rounded text-blue-600 focus:ring-blue-500">
-                    <label for="featured-filter" class="ml-2 text-gray-700">Show featured exercises only</label>
-                </div>
-                <!-- Exercise Grid -->
-                <div id="loading-state" class="text-center py-12 hidden">
-                    <i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
-                </div>
-                <div id="exercise-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Populated by JavaScript -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Workout Programs Section -->
-        <section id="programs" class="mb-12">
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-2xl font-bold mb-6">Workout Programs</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <button onclick="showProgram('fullBody')" class="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-dumbbell mr-2"></i>Full Body Workout
-                    </button>
-                    <button onclick="showProgram('upperLower')" class="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-dumbbell mr-2"></i>Upper/Lower Split
-                    </button>
-                    <button onclick="showProgram('hiit')" class="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-running mr-2"></i>HIIT Circuit
-                    </button>
-                </div>
-                <div id="program-details">
-                    <!-- Populated by JavaScript -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Progress Tracking Section -->
-        <section id="progress" class="mb-12">
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-2xl font-bold mb-6">Progress Tracking</h2>
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-blue-50 rounded-lg p-4 text-center">
-                        <div class="text-3xl font-bold text-blue-600 mb-1" id="total-workouts">0</div>
-                        <div class="text-sm text-gray-600">Total Workouts</div>
-                    </div>
-                    <div class="bg-green-50 rounded-lg p-4 text-center">
-                        <div class="text-3xl font-bold text-green-600 mb-1" id="week-workouts">0</div>
-                        <div class="text-sm text-gray-600">This Week</div>
-                    </div>
-                    <div class="bg-purple-50 rounded-lg p-4 text-center">
-                        <div class="text-3xl font-bold text-purple-600 mb-1" id="total-time">0h</div>
-                        <div class="text-sm text-gray-600">Total Time</div>
-                    </div>
-                    <div class="bg-orange-50 rounded-lg p-4 text-center">
-                        <div class="text-3xl font-bold text-orange-600 mb-1" id="workout-streak">0</div>
-                        <div class="text-sm text-gray-600">Day Streak</div>
-                    </div>
-                </div>
-                <!-- Calendar -->
-                <div class="mb-8">
-                    <h3 class="text-xl font-semibold mb-4">Activity Calendar</h3>
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <div class="grid grid-cols-7 gap-2 text-center mb-2">
-                            <div class="text-sm text-gray-600">Sun</div>
-                            <div class="text-sm text-gray-600">Mon</div>
-                            <div class="text-sm text-gray-600">Tue</div>
-                            <div class="text-sm text-gray-600">Wed</div>
-                            <div class="text-sm text-gray-600">Thu</div>
-                            <div class="text-sm text-gray-600">Fri</div>
-                            <div class="text-sm text-gray-600">Sat</div>
-                        </div>
-                        <div id="calendar-grid" class="grid grid-cols-7 gap-2">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-                <!-- Recent Workouts -->
-                <div>
-                    <h3 class="text-xl font-semibold mb-4">Recent Workouts</h3>
-                    <div id="workout-history" class="space-y-4">
-                        <!-- Populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+    </div>
 
     <!-- Scripts -->
-    <script src="js/main.js"></script>
-    <script src="js/timer.js"></script>
-    <script src="js/workouts.js"></script>
-    <script src="js/programs.js"></script>
-    <script src="js/progress.js"></script>
-    <script src="js/search.js"></script>
-
+    <script src="js/ai-trainer.js"></script>
+    <script src="js/onboarding.js"></script>
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
+        // Hide loading screen when everything is loaded
+        window.addEventListener('load', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 300);
+            }
+
+            // Check if onboarding is already completed
+            const onboardingComplete = localStorage.getItem('onboardingComplete');
+            if (onboardingComplete === 'true') {
+                window.location.href = '/app.html';
+            }
         });
     </script>
 </body>
